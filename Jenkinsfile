@@ -1,12 +1,12 @@
 pipeline {
     agent any
     tools { 
-        maven 'maven-3.8.6' 
+        maven 'maven-3.9.1' 
     }
     stages {
         stage('Checkout git') {
             steps {
-               git branch: 'main', url: 'https://github.com/praveensirvi1212/DevSecOps-project'
+               git branch: 'main', url: 'https://github.com/enyioman/DevSecOps-project-1'
             }
         }
         
@@ -40,13 +40,13 @@ pipeline {
         
         stage('Docker  Build') {
             steps {
-      	        sh 'docker build -t praveensirvi/sprint-boot-app:v1.$BUILD_ID .'
-                sh 'docker image tag praveensirvi/sprint-boot-app:v1.$BUILD_ID praveensirvi/sprint-boot-app:latest'
+      	        sh 'docker build -t fynewily/sprint-boot-app:v1.$BUILD_ID .'
+                sh 'docker image tag fynewily/sprint-boot-app:v1.$BUILD_ID fynewily/sprint-boot-app:latest'
             }
         }
         stage('Image Scan') {
             steps {
-      	        sh ' trivy image --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o report.html praveensirvi/sprint-boot-app:latest '
+      	        sh ' trivy image --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o report.html fynewily/sprint-boot-app:latest '
             }
         }
         stage('Upload Scan report to AWS S3') {
@@ -56,7 +56,7 @@ pipeline {
          }
         stage('Docker  Push') {
             steps {
-                withVault(configuration: [skipSslVerification: true, timeout: 60, vaultCredentialId: 'vault-cred', vaultUrl: 'http://your-vault-server-ip:8200'], vaultSecrets: [[path: 'secrets/creds/docker', secretValues: [[vaultKey: 'username'], [vaultKey: 'password']]]]) {
+                withVault(configuration: [skipSslVerification: true, timeout: 60, vaultCredentialId: 'vault-cred', vaultUrl: 'http://34.228.188.132:8200/'], vaultSecrets: [[path: 'secrets/creds/docker', secretValues: [[vaultKey: 'username'], [vaultKey: 'password']]]]) {
                     sh "docker login -u ${username} -p ${password} "
                     sh 'docker push praveensirvi/sprint-boot-app:v1.$BUILD_ID'
                     sh 'docker push praveensirvi/sprint-boot-app:latest'
@@ -85,11 +85,11 @@ def sendSlackNotifcation()
 {
     if ( currentBuild.currentResult == "SUCCESS" ) {
         buildSummary = "Job_name: ${env.JOB_NAME}\n Build_id: ${env.BUILD_ID} \n Status: *SUCCESS*\n Build_url: ${BUILD_URL}\n Job_url: ${JOB_URL} \n"
-        slackSend( channel: "#devops", token: 'slack-token', color: 'good', message: "${buildSummary}")
+        slackSend( channel: "#devsecops", token: 'slack-token', color: 'good', message: "${buildSummary}")
     }
     else {
         buildSummary = "Job_name: ${env.JOB_NAME}\n Build_id: ${env.BUILD_ID} \n Status: *FAILURE*\n Build_url: ${BUILD_URL}\n Job_url: ${JOB_URL}\n  \n "
-        slackSend( channel: "#devops", token: 'slack-token', color : "danger", message: "${buildSummary}")
+        slackSend( channel: "#devsecops", token: 'slack-token', color : "danger", message: "${buildSummary}")
     }
 }
 
