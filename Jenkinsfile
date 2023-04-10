@@ -86,7 +86,7 @@ pipeline {
             }
         }
 }
-
+}
 def sendSlackNotifcation()
 {
     if ( currentBuild.currentResult == "SUCCESS" ) {
@@ -98,5 +98,5 @@ def sendSlackNotifcation()
         slackSend( channel: "#devsecops", token: 'slack-token', color : "danger", message: "${buildSummary}")
     }
 }
-}
+
     
