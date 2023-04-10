@@ -25,8 +25,8 @@ pipeline {
                 withSonarQubeEnv('SonarQube-server') {
                         sh 'mvn clean verify sonar:sonar \
                         -Dsonar.projectKey=devsecops \
-                        -Dsonar.host.url=$sonarurl \
-                        -Dsonar.login=$sonarlogin'
+                        -Dsonar.host.url=http://54.162.28.43:9000 \
+                        -Dsonar.login=$jenkins-sonarqube'
                 }
             }
         }
