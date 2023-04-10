@@ -38,7 +38,7 @@ pipeline {
             }
         }
         
-        stage('Docker  Build') {
+        stage('Docker Build') {
             steps {
       	        sh 'docker build -t fynewily/sprint-boot-app:v1.$BUILD_ID .'
                 sh 'docker image tag fynewily/sprint-boot-app:v1.$BUILD_ID fynewily/sprint-boot-app:latest'
@@ -54,7 +54,7 @@ pipeline {
                   sh 'aws s3 cp report.html s3://devsecops-jenkins-logs/'
               }
          }
-        stage('Docker  Push') {
+        stage('Docker Push') {
             steps {
                 withVault(configuration: [skipSslVerification: true, timeout: 60, vaultCredentialId: 'vault-cred', vaultUrl: 'http://34.228.188.132:8200/'], vaultSecrets: [[path: 'secrets/creds/docker', secretValues: [[vaultKey: 'username'], [vaultKey: 'password']]]]) {
                     sh "docker login -u ${username} -p ${password} "
