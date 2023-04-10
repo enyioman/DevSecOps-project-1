@@ -53,12 +53,6 @@ pipeline {
                   sh 'aws s3 cp report.html s3://devsecops-jenkins-logs/'
               }
          }
-         stage("Upload") {
-              steps{
-                    withAWS(region:"${region}", credentials:"${aws_credential}"){
-                        s3Upload(file:"${TAG_NAME}", bucket:"${bucket}", path:"${TAG_NAME}/")
-          } 
-          }   
         }
         stage('Docker Push') {
             steps {
@@ -77,7 +71,6 @@ pipeline {
                 }
             }
         }
-        
  
     }
     post{
@@ -86,7 +79,7 @@ pipeline {
             }
         }
 }
-}
+
 def sendSlackNotifcation()
 {
     if ( currentBuild.currentResult == "SUCCESS" ) {
