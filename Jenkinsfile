@@ -26,8 +26,7 @@ pipeline {
                         sh 'mvn clean verify sonar:sonar \
                         -Dsonar.projectKey=devsecops \
                         -Dsonar.host.url=http://54.162.28.43:9000 \
-                        -Dsonar.login=$jenkins-sonarqube'
-                }
+                        -Dsonar.login=sqp_678c2cafbba2cc11a9a2fbdbc3c843d26c4652f2'
             }
         }
         stage("Quality Gate") {
@@ -54,6 +53,13 @@ pipeline {
                   sh 'aws s3 cp report.html s3://devsecops-jenkins-logs/'
               }
          }
+         stage("Upload") {
+              steps{
+                    withAWS(region:"${region}", credentials:"${aws_credential}"){
+                        s3Upload(file:"${TAG_NAME}", bucket:"${bucket}", path:"${TAG_NAME}/")
+          } 
+          }   
+        }
         stage('Docker Push') {
             steps {
                 withVault(configuration: [skipSslVerification: true, timeout: 60, vaultCredentialId: 'vault-cred', vaultUrl: 'http://34.228.188.132:8200/'], vaultSecrets: [[path: 'secrets/creds/docker', secretValues: [[vaultKey: 'username'], [vaultKey: 'password']]]]) {
