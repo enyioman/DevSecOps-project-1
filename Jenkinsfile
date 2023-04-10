@@ -27,6 +27,7 @@ pipeline {
                         -Dsonar.projectKey=devsecops \
                         -Dsonar.host.url=http://54.162.28.43:9000 \
                         -Dsonar.login=$sonarlogin'
+                }
             }
         }
         stage("Quality Gate") {
@@ -37,7 +38,7 @@ pipeline {
             }
         }
         
-        stage('Docker Build') {
+        stage('Docker  Build') {
             steps {
       	        sh 'docker build -t fynewily/sprint-boot-app:v1.$BUILD_ID .'
                 sh 'docker image tag fynewily/sprint-boot-app:v1.$BUILD_ID fynewily/sprint-boot-app:latest'
@@ -53,14 +54,13 @@ pipeline {
                   sh 'aws s3 cp report.html s3://devsecops-jenkins-logs/'
               }
          }
-        }
-        stage('Docker Push') {
+        stage('Docker  Push') {
             steps {
-                withVault(configuration: [skipSslVerification: true, timeout: 60, vaultCredentialId: 'vault-cred', vaultUrl: 'http://34.228.188.132:8200/'], vaultSecrets: [[path: 'secrets/creds/docker', secretValues: [[vaultKey: 'username'], [vaultKey: 'password']]]]) {
+                withVault(configuration: [skipSslVerification: true, timeout: 60, vaultCredentialId: 'vault-cred', vaultUrl: 'http://your-vault-server-ip:8200'], vaultSecrets: [[path: 'secrets/creds/docker', secretValues: [[vaultKey: 'username'], [vaultKey: 'password']]]]) {
                     sh "docker login -u ${username} -p ${password} "
-                    sh 'docker push praveensirvi/sprint-boot-app:v1.$BUILD_ID'
-                    sh 'docker push praveensirvi/sprint-boot-app:latest'
-                    sh 'docker rmi praveensirvi/sprint-boot-app:v1.$BUILD_ID praveensirvi/sprint-boot-app:latest'
+                    sh 'docker push fynewily/sprint-boot-app:v1.$BUILD_ID'
+                    sh 'docker push fynewily/sprint-boot-app:latest'
+                    sh 'docker rmi fynewily/sprint-boot-app:v1.$BUILD_ID fynewily/sprint-boot-app:latest'
                 }
             }
         }
@@ -71,6 +71,7 @@ pipeline {
                 }
             }
         }
+        
  
     }
     post{
@@ -91,5 +92,3 @@ def sendSlackNotifcation()
         slackSend( channel: "#devsecops", token: 'slack-token', color : "danger", message: "${buildSummary}")
     }
 }
-
-    
