@@ -24,7 +24,7 @@ pipeline {
             steps{
                 withSonarQubeEnv('SonarQube-server') {
                         sh 'mvn clean verify sonar:sonar \
-                        -Dsonar.projectKey=devsecops \
+                        -Dsonar.projectKey=demo \
                         -Dsonar.host.url=http://54.162.28.43:9000 \
                         -Dsonar.login=$sonarlogin'
                 }
