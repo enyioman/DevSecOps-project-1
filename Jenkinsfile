@@ -52,11 +52,12 @@ pipeline {
                 sh 'ls -R'
             }
         }
-        stage('Copy Artifacts to S3') {
+        stage('Copy to S3') {
             steps {
-                // Copy artifacts to S3
-                withAWS(region: 'us-east-1') {
-                    s3Upload(bucket: 'devsecops-jenkins-logs', pathStyleAccessEnabled: true, payloadSigningEnabled: true, workingDir: '.', file: 'report.html')
+                script {
+                    withAWS(region:'us-east-1', credentials:'aws-credentials') {
+                        s3Upload(bucket: 'devsecops-jenkins-logs', pathStyleAccessEnabled: true, payloadSigningEnabled: true, workingDir: '.', file: 'report.html')
+                    }
                 }
             }
         }
