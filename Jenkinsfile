@@ -47,8 +47,8 @@ pipeline {
             }
         }
         stage('Upload scan report to AWS S3') {
-              steps {
-                  withAWS(region:'us-west-2',credentials:'jenkins-aws') {
+            steps {
+                  withAWS(region:'us-east-1',credentials:'jenkins-aws') {
                   sh 'echo "Uploading content with AWS creds"'
                       s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:'report.html', bucket:'devsecops-jenkins-logs')
                 }
