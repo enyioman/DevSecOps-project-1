@@ -18,11 +18,3 @@ class DemoApplicationTests {
     }
 }
 
-// @SpringBootTest
-// class DemoApplicationTests {
-
-// 	@Test
-// 	void contextLoads() {
-// 	}
-
-// }

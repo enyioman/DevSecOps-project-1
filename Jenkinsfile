@@ -46,11 +46,14 @@ pipeline {
       	        sh ' trivy image --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o report.html fynewily/sprint-boot-app:latest '
             }
         }
-        stage('Upload Scan report to AWS S3') {
+        stage('Upload scan report to AWS S3') {
               steps {
-                  sh 'aws s3 cp report.html s3://devsecops-jenkins-logs/'
-              }
-         }
+                  withAWS(region:'us-west-2',credentials:'jenkins-aws') {
+                  sh 'echo "Uploading content with AWS creds"'
+                      s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:'report.html', bucket:'devsecops-jenkins-logs')
+                }
+            }
+        }
         stage('Docker  Push') {
             steps {
                 withVault(configuration: [skipSslVerification: true, timeout: 60, vaultCredentialId: 'vault-cred', vaultUrl: 'http://34.228.188.132:8200/'], vaultSecrets: [[path: 'secrets/creds/docker', secretValues: [[vaultKey: 'username'], [vaultKey: 'password']]]]) {
