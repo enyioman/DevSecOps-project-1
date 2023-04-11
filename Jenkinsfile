@@ -46,10 +46,16 @@ pipeline {
       	        sh ' trivy image --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o report.html fynewily/sprint-boot-app:latest '
             }
         }
+        stages {
+            stage('List Files in Workspace') {
+                steps {
+                    sh 'ls -R'
+            }
+        }
         stage('Copy Artifacts to S3') {
             steps {
                 // Copy artifacts to S3
-                s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file: 'report.html', bucket: 'devsecops-jenkins-logs', workingDir: '.', selectedRegion: 'us-east-1')
+                s3Upload(usePathStyleEndpoint: true, payloadSigningEnabled: true, file: 'report.html', bucket: 'devsecops-jenkins-logs', workingDir: '.', selectedRegion: 'us-east-1')
             }
         }
         stage('Docker  Push') {
