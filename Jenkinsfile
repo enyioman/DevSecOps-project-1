@@ -46,12 +46,9 @@ pipeline {
       	        sh ' trivy image --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o report.html fynewily/sprint-boot-app:latest '
             }
         }
-        stage('Upload scan report to AWS S3') {
-            steps {
-                  withAWS(region:'us-east-1',credentials:'jenkins-aws') {
-                  sh 'echo "Uploading content with AWS creds"'
-                      s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:'report.html', bucket:'devsecops-jenkins-logs')
-                }
+        stage('Upload Scan report to AWS S3') {
+              steps {
+                  sh 'aws s3 cp report.html s3://devsecops-project/'
             }
         }
         stage('Docker  Push') {
