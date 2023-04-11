@@ -55,15 +55,8 @@ pipeline {
         stage('Copy Artifacts to S3') {
             steps {
                 // Copy artifacts to S3
-                script {
-                    def s3 = [:]
-                    s3['bucket'] = 'devsecops-jenkins-logs'
-                    s3['path_style'] = true
-                    s3['enable_signature_v4'] = true
-                    s3['working_dir'] = '.'
-                    s3['region'] = 'us-east-1'
-                    s3['files'] = 'report.html'
-                    s3Upload s3
+                withAWS(region: 'us-east-1') {
+                    s3Upload(bucket: 'devsecops-jenkins-logs', pathStyleAccessEnabled: true, payloadSigningEnabled: true, workingDir: '.', file: 'report.html')
                 }
             }
         }
