@@ -29,19 +29,12 @@ pipeline {
                         -Dsonar.login=sqp_c1821f49c254cb0756b6a5d3bdb484a92b77f6ea'
                 }
             }
-        }
-        stage("Quality Gate"){
-            steps{
-                timeout(time: 10, unit: 'MINUTES') {
-                    def qg = waitForQualityGate()
-                    if (qg.status != 'OK') {
-                        error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                    }
-                }
+        }       
+        stage("Quality Gate") {
+            steps {
+                waitForQualityGate abortPipeline: true
             }
-            
-        }        
-        
+        }
         stage('Docker  Build') {
             steps {
       	        sh 'docker build -t fynewily/sprint-boot-app:v1.$BUILD_ID .'
