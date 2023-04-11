@@ -55,7 +55,7 @@ pipeline {
         stage('Copy to S3') {
             steps {
                 script {
-                    withAWS(region:'us-east-1', credentials:'enyioma') {
+                    withAWS(region:'us-east-1', credentials:'jenkins-aws') {
                         s3Upload(bucket: 'devsecops-jenkins-logs', pathStyleAccessEnabled: true, payloadSigningEnabled: true, workingDir: '.', file: 'report.html')
                     }
                 }
