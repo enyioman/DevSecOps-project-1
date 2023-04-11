@@ -50,6 +50,7 @@ pipeline {
             stage('List Files in Workspace') {
                 steps {
                     sh 'ls -R'
+                }
             }
         }
         stage('Copy Artifacts to S3') {
