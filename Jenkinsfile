@@ -84,14 +84,8 @@ pipeline {
     post{
         always{
             sendSlackNotifcation()
-            }
         }
-    /*** workspace clean up*/
-    post {
-        always {
-            cleanWs()
-        }
-    }   
+    }
 }
 
 def sendSlackNotifcation()
