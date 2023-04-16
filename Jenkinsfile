@@ -37,8 +37,8 @@ pipeline {
         }
         stage('Docker Build') {
             steps {
-      	        sh 'docker build -t fynewily/sprint-boot-app:v1.$BUILD_ID .'
-                sh 'docker image tag fynewily/sprint-boot-app:v1.$BUILD_ID fynewily/sprint-boot-app:latest'
+      	        sh 'sudo docker build -t fynewily/sprint-boot-app:v1.$BUILD_ID .'
+                sh 'sudo docker image tag fynewily/sprint-boot-app:v1.$BUILD_ID fynewily/sprint-boot-app:latest'
             }
         }
         // stage('Image Scan') {
