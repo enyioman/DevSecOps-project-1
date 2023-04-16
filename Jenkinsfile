@@ -35,12 +35,27 @@ pipeline {
                 waitForQualityGate abortPipeline: true
             }
         }
+        
         stage('Docker Build') {
             steps {
-      	        sh 'docker build -t fynewily/sprint-boot-app:v1.$BUILD_ID .'
-                sh 'docker image tag fynewily/sprint-boot-app:v1.$BUILD_ID fynewily/sprint-boot-app:latest'
+                script {
+                    try {
+                        sh 'docker build -t fynewily/sprint-boot-app:v1.$BUILD_ID .'
+                        sh 'docker image tag fynewily/sprint-boot-app:v1.$BUILD_ID fynewily/sprint-boot-app:latest'
+                    } catch (Exception ex) {
+                        currentBuild.result = 'FAILURE'
+                        error("Failed to build Docker image: ${ex.getMessage()}")
+                    }
+                }
             }
         }
+  
+        // stage('Docker Build') {
+        //     steps {
+      	//         sh 'docker build -t fynewily/sprint-boot-app:v1.$BUILD_ID .'
+        //         sh 'docker image tag fynewily/sprint-boot-app:v1.$BUILD_ID fynewily/sprint-boot-app:latest'
+        //     }
+        // }
         // stage('Image Scan') {
         //     steps {
       	//         sh ' trivy image --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o report.html fynewily/sprint-boot-app:latest '
