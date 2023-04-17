@@ -49,11 +49,11 @@ pipeline {
                 }
             }
         }
-        // stage('Image Scan') {
-        //     steps {
-      	//         sh ' trivy image --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o report.html fynewily/sprint-boot-app:latest '
-        //     }
-        // }
+        stage('Image Scan') {
+            steps {
+      	        sh ' trivy image --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o report.html fynewily/sprint-boot-app:latest '
+            }
+        }
         stage('List Files in Workspace') {
             steps {
                 sh 'ls -R'
@@ -68,6 +68,17 @@ pipeline {
                 }
             }
         }
+        stage('Docker Push') {
+            steps {
+                withVault(configuration: [skipSslVerification: true, timeout: 60, vaultCredentialId: 'vault-jenkins-role', vaultUrl: 'http://34.228.188.132:8200'], vaultSecrets: [[path: 'secrets/creds/docker', secretValues: [[vaultKey: 'username'], [vaultKey: 'password']]]]) {
+                    sh "docker login -u ${username} -p ${password} "
+                    sh 'docker push fynewily/sprint-boot-app:v1.$BUILD_ID'
+                    sh 'docker push fynewily/sprint-boot-app:latest'
+                    sh 'docker rmi fynewily/sprint-boot-app:v1.$BUILD_ID fynewily/sprint-boot-app:latest'
+                }
+            }
+        }
+
         // stage('Docker Push') {
         //     steps {
         //         script {
@@ -89,29 +100,6 @@ pipeline {
         //         }
         //     }
         // }
-        // stage('Docker Push') {
-        //     steps {
-        //         withVault(configuration: [skipSslVerification: true, timeout: 60, vaultCredentialId: 'vault-jenkins-role', vaultUrl: 'http://34.228.188.132:8200'], vaultSecrets: [[path: 'secrets/creds/docker', secretValues: [[vaultKey: 'username'], [vaultKey: 'password']]]]) {
-        //         withCredentials([string(credentialsId: 'jenkins-docker', variable: 'DOCKER_USERNAME'), string(credentialsId: 'jenkins-docker', variable: 'DOCKER_PASSWORD')]) {
-        //             sh "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
-        //             sh "docker push fynewily/sprint-boot-app:v1.$BUILD_ID"
-        //             sh "docker push fynewily/sprint-boot-app:latest"
-        //             sh "docker rmi fynewily/sprint-boot-app:v1.$BUILD_ID fynewily/sprint-boot-app:latest"
-        //         }
-        //         }
-        //     }
-        // }
-        
-        stage('Docker Push') {
-            steps {
-                withVault(configuration: [skipSslVerification: true, timeout: 60, vaultCredentialId: 'vault-jenkins-role', vaultUrl: 'http://34.228.188.132:8200'], vaultSecrets: [[path: 'secrets/creds/docker', secretValues: [[vaultKey: 'username'], [vaultKey: 'password']]]]) {
-                    sh "docker login -u ${username} -p ${password} "
-                    sh 'docker push fynewily/sprint-boot-app:v1.$BUILD_ID'
-                    sh 'docker push fynewily/sprint-boot-app:latest'
-                    sh 'docker rmi fynewily/sprint-boot-app:v1.$BUILD_ID fynewily/sprint-boot-app:latest'
-                }
-            }
-        }
     }
     post{
         always{
