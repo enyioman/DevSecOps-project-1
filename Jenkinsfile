@@ -70,16 +70,17 @@ pipeline {
         }
         stage('Docker Push') {
             steps {
-                withVault(configuration: [skipSslVerification: true, timeout: 60, vaultCredentialId: 'jenkins-docker', vaultUrl: 'http://34.228.188.132:8200'], vaultSecrets: [[path: 'secrets/creds/docker', secretValues: [[vaultKey: 'username'], [vaultKey: 'password']]]]) {
-                    script {
+                try {
+                    withVault(configuration: [skipSslVerification: true, timeout: 60, vaultCredentialId: 'jenkins-docker', vaultUrl: 'http://34.228.188.132:8200'], vaultSecrets: [[path: 'secrets/creds/docker', secretValues: [[vaultKey: 'username'], [vaultKey: 'password']]]]) {
+                        script {
                         def username = vaultSecrets.get("secrets/creds/docker").get("username")
                         def password = vaultSecrets.get("secrets/creds/docker").get("password")
                         echo "Docker credentials retrieved from Vault: username=${username}, password=${password}"
                         sh "docker login -u ${username} -p ${password}"
-                        sh 'docker push fynewily/sprint-boot-app:v1.$BUILD_ID'
-                        sh 'docker push fynewily/sprint-boot-app:latest'
-                        sh 'docker rmi fynewily/sprint-boot-app:v1.$BUILD_ID fynewily/sprint-boot-app:latest'
+                        }
                     }
+                } catch (Exception e) {
+                    echo "Error retrieving Docker credentials from Vault: ${e.getMessage()}"
                 }
             }
         }
