@@ -99,15 +99,6 @@ pipeline {
         //         }
         //     }
         // }
-        stage('Deploy to k8s') {
-            steps {
-                script{
-                    kubernetesDeploy configs: 'spring-boot-deployment.yaml', kubeconfigId: 'kubernetes'
-                }
-            }
-        }
-        
- 
     }
     post{
         always{
