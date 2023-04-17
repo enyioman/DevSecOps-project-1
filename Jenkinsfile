@@ -73,13 +73,13 @@ pipeline {
                 try {
                     withVault(configuration: [skipSslVerification: true, timeout: 60, vaultCredentialId: 'jenkins-docker', vaultUrl: 'http://34.228.188.132:8200'], vaultSecrets: [[path: 'secrets/creds/docker', secretValues: [[vaultKey: 'username'], [vaultKey: 'password']]]]) {
                         script {
-                        def username = vaultSecrets.get("secrets/creds/docker").get("username")
-                        def password = vaultSecrets.get("secrets/creds/docker").get("password")
-                        echo "Docker credentials retrieved from Vault: username=${username}, password=${password}"
-                        sh "docker login -u ${username} -p ${password}"
+                            def username = vaultSecrets.get("secrets/creds/docker").get("username")
+                            def password = vaultSecrets.get("secrets/creds/docker").get("password")
+                            echo "Docker credentials retrieved from Vault: username=${username}, password=${password}"
+                            sh "docker login -u ${username} -p ${password}"
                         }
                     }
-                } catch (Exception e) {
+                    } catch (Exception e) {
                     echo "Error retrieving Docker credentials from Vault: ${e.getMessage()}"
                 }
             }
